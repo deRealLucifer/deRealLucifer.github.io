@@ -4,14 +4,11 @@ title: About
 permalink: /about/
 ---
 
-My name is RAJOUL Abdeljalil. I’m a CyberSec enthusiast and CTF player. 
+My name is Nguyen Hoang Danh. I’m interested in CyberSec
 
-Other than that I hack vulnerable machines, mostly from [HackTheBox](http://hackthebox.eu/) or [Vulnhub](http://vulnhub.com/) and try to do writeups about them.
+I participate in ctfs and there are some blogs and writeups about some of them
 
 
-* Twitter: [rajoul6](https://twitter.com/@rajoul6)
-* Github: [rajoul](https://github.com/rajoul)
-* Keybase: [rajesec](https://keybase.io/rajesec)
-* Mail: abdejalil.rajoul@gmail.com
-* Hack The Box profile : [Bl0wfish](https://www.hackthebox.eu/home/users/profile/94847)
+* Github: [lucifer](https://github.com/darealDanh)
+* Mail: hoangdanh732005@gmail.com
 
