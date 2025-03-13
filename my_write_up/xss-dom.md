@@ -1,4 +1,4 @@
-# XSS - DOM
+# XSS-DOM
 
 At first, we can see that there is an serious xss vuln in the /vuln page
 
